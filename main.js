@@ -21,7 +21,7 @@ function setup() {
     WORLD.lifes.push(new Plant({x: random(WIDTH), y: random(HEIGHT)}));
   });
 
-  _.times(60, function() {
+  _.times(3000, function() {
     WORLD.lifes.push(new Animal({x: random(WIDTH), y: random(HEIGHT), hierarchy: 15, eye: 30, zone:10, energy: 100}));
   });
 
@@ -30,6 +30,7 @@ function setup() {
 var age = 0;
 function draw() {
   age++;
+  console.time(age);
   background(51);
   
   // remove dead life
@@ -82,6 +83,8 @@ function draw() {
   _.each(WORLD.lifes, function(l) {
     drawLife(l);
   });
+
+  console.timeEnd(age);
 }
 
 
