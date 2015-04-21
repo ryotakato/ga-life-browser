@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GA</title>
+  <style>
+    .status table, .status tr, .status td {
+      border:solid 1px gray;
+      border-collapse: collapse;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="heading" style="float:left;">
+    <h1>GA</h1>
+  </div>
+  <div class="status">
+    <table>
+      <thead>
+        <tr>
+          <td>age</td>
+          <td>count</td>
+          <td>hierarchy</td>
+          <td>eye</td>
+          <td>zone</td>
+          <td>pace</td>
+          <td>energy</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span id="age"></span></td>
+          <td><span id="count"></span></td>
+          <td><span id="hierarchy"></span></td>
+          <td><span id="eye"></span></td>
+          <td><span id="zone"></span></td>
+          <td><span id="pace"></span></td>
+          <td><span id="energy"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="float:none;">
+  </div>
+  <script type="text/javascript" src="bower_components/p5js/lib/p5.js"></script>
+  <script type="text/javascript" src="bower_components/underscore/underscore.js"></script>
+  <script type="text/javascript" src="util.js"></script>
+  <script type="text/javascript" src="life.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+</body>
+
+</html>
