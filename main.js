@@ -1,132 +1,174 @@
 
 var WORLD = { 
-  lifes: [],
+  elements: [],
   enemies: function(hierarchy) {
-    return _.filter(this.lifes, function(l) { return hierarchy + 10 < l.hierarchy;});
+    return _.filter(this.elements, function(e) { return hierarchy + 10 < e.life.hierarchy;});
   },
   feeds: function(hierarchy) {
-    return _.filter(this.lifes, function(l) { return hierarchy - 50 < l.hierarchy && l.hierarchy < Math.max(hierarchy - 10, 1);});
+    return _.filter(this.elements, function(e) { return hierarchy - 50 < e.life.hierarchy && e.life.hierarchy < Math.max(hierarchy - 10, 1);});
+  },
+  born: function(l) {
+    // define color
+    var g = 255;
+    var r = 128;
+    var b = 0;
+    r = r + l.hierarchy * 4;
+    if (255 < r) {
+      g = g - (r - 255);
+    }
+    var c = colorUtil.rgbToHex(r, g, b);
+
+    this.elements.push({
+      life: l,
+      graphics: new PIXI.Graphics(),
+      shape: new PIXI.Ellipse(l.x, l.y, l.w, l.h),
+      color: c
+    });
+  },
+
+  sweep: function() {
+    // remove dead life 
+    this.elements = _.filter(this.elements, function(e) { return e.life.alive; });
+  },
+
+  status: function(age) {
+    document.getElementById("age").innerHTML = age;
+    var count = 0;
+    var hierarchy = 0;
+    var eye = 0;
+    var zone = 0;
+    var pace = 0;
+    var energy = 0;
+    _.each(this.elements, function(e) {
+      if (e.life instanceof Animal) {
+        count++;
+        energy = Math.max(energy, e.life.energy);
+      }
+      hierarchy = Math.max(hierarchy, e.life.hierarchy || 0);
+      eye = Math.max(eye, e.life.eye || 0);
+      zone = Math.max(zone, e.life.zone || 0);
+      pace = Math.max(pace, e.life.defaultPace || 0);
+    });
+    document.getElementById("count").innerHTML = count;
+    document.getElementById("hierarchy").innerHTML = hierarchy;
+    document.getElementById("eye").innerHTML = eye;
+    document.getElementById("zone").innerHTML = zone;
+    document.getElementById("pace").innerHTML = pace;
+    document.getElementById("energy").innerHTML = energy;
   }
 };
 var WIDTH = 1000;
 var HEIGHT = 500;
 
-function setup() {
   // screen config
-  createCanvas(WIDTH, HEIGHT);
-  background(51);
+var stage = new PIXI.Stage(0x000000);
 
-  // init life
-  _.times(220, function() {
-    WORLD.lifes.push(new Plant({x: random(WIDTH), y: random(HEIGHT)}));
-  });
 
-  _.times(3000, function() {
-    WORLD.lifes.push(new Animal({x: random(WIDTH), y: random(HEIGHT), hierarchy: 15, eye: 30, zone:10, energy: 100}));
-  });
 
-}
+var renderer = PIXI.autoDetectRenderer(WIDTH, HEIGHT);
+
+
+var pixiView = document.getElementById("pixiview");
+pixiView.appendChild(renderer.view);
+
+
+// init life
+_.times(220, function() {
+  WORLD.born(new Plant({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT)}));
+});
+
+_.times(60, function() {
+  WORLD.born(new Animal({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT), hierarchy: 15, eye: 30, zone:10, energy: 100}));
+});
 
 var age = 0;
-function draw() {
+function animate() {
+  if (!stoped) {
+    requestAnimFrame(animate);
+  }
+  //graphics.clear();
+  stage.removeChildren();
   age++;
   console.time(age);
-  background(51);
   
-  // remove dead life
-  WORLD.lifes = _.filter(WORLD.lifes, function(l) { return l.alive });
+  // sweep
+  WORLD.sweep();
 
   // status
-  status(age);
+  WORLD.status(age);
 
   // add plant
   _.times(1, function() {
     if (_.random(0, 100) < 5) {
-      WORLD.lifes.push(new Animal({x: random(WIDTH), y: random(HEIGHT), hierarchy: 5, eye: 30, zone:10, energy: 100}));
+      WORLD.born(new Animal({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT), hierarchy: 5, eye: 30, zone:10, energy: 100}));
     } else {
-      WORLD.lifes.push(new Plant({x: random(WIDTH), y: random(HEIGHT)}));
-      WORLD.lifes.push(new Plant({x: random(WIDTH), y: random(HEIGHT)}));
+      WORLD.born(new Plant({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT)}));
+      WORLD.born(new Plant({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT)}));
     }
   });
 
   // search
-  _.each(WORLD.lifes, function(l) {
-    if (l.search) { l.search(); }
+  _.each(WORLD.elements, function(e) {
+    if (e.life.search) { e.life.search(); }
   });
   // settle
-  _.each(WORLD.lifes, function(l) {
-    if (l.settle) { l.settle(); }
+  _.each(WORLD.elements, function(e) {
+    if (e.life.settle) { e.life.settle(); }
   });
   // walk
-  _.each(WORLD.lifes, function(l) {
-    if (l.walk) { l.walk(); }
+  _.each(WORLD.elements, function(e) {
+    if (e.life.walk) { e.life.walk(); }
   });
   // eat
-  _.each(WORLD.lifes, function(l) {
-    if (l.eat) { l.eat(); }
+  _.each(WORLD.elements, function(e) {
+    if (e.life.eat) { e.life.eat(); }
   });
   // starve
-  _.each(WORLD.lifes, function(l) {
-    if (l.starve) { l.starve(); }
+  _.each(WORLD.elements, function(e) {
+    if (e.life.starve) { e.life.starve(); }
   });
   // couple
-  _.each(WORLD.lifes, function(l) {
-    if (l.couple) { l.couple(); }
+  _.each(WORLD.elements, function(e) {
+    if (e.life.couple) { e.life.couple(); }
   });
   // mate
-  _.each(WORLD.lifes, function(l) {
-    if (l.mate) { l.mate(); }
+  _.each(WORLD.elements, function(e) {
+    if (e.life.mate) { e.life.mate(); }
   });
 
 
   // draw life
-  _.each(WORLD.lifes, function(l) {
-    drawLife(l);
+  _.each(WORLD.elements, function(e) {
+    e.shape.x = e.life.x;
+    e.shape.y = e.life.y;
+
+    draw(e);
   });
 
   console.timeEnd(age);
+  renderer.render(stage);
 }
+
+requestAnimFrame(animate);
 
 
 var stoped = false;
 function mouseClicked() {
   if (stoped) {
-    loop();
     stoped = false;
+    requestAnimFrame(animate);
   } else {
-    noLoop();
     stoped = true;
   }
-
 }
 
-function drawLife(l) {
-  // Life
-  var g = 255;
-  var r = 128;
-  var b = 0;
-  r = r + l.hierarchy * 4;
-  if (255 < r) {
-    g = g - (r - 255);
-  }
-  var c = color(r, g, b);
-  stroke(c);
-  fill(c);
-  ellipse(l.x, l.y, l.w, l.h);
+pixiView.addEventListener('click', mouseClicked);
+
+function draw(e) {
+  e.graphics.clear();
+  e.graphics.beginFill(e.color);
+  e.graphics.drawShape(e.shape);
+  e.graphics.endFill();
+  stage.addChild(e.graphics);
 }
 
-function status(age) {
-  document.getElementById("age").innerHTML = age;
-  var count = _.filter(WORLD.lifes, function(l) { return l instanceof Animal;}).length;
-  var hierarchy = _.max(WORLD.lifes, function(l) { return l.hierarchy;}).hierarchy;
-  var eye = _.max(WORLD.lifes, function(l) { return l.eye;}).eye;
-  var zone = _.max(WORLD.lifes, function(l) { return l.zone;}).zone;
-  var pace = _.max(WORLD.lifes, function(l) { return l.defaultPace;}).defaultPace;
-  var energy = _.max(WORLD.lifes, function(l) { return l.energy;}).energy;
-  document.getElementById("count").innerHTML = count;
-  document.getElementById("hierarchy").innerHTML = hierarchy;
-  document.getElementById("eye").innerHTML = eye;
-  document.getElementById("zone").innerHTML = zone;
-  document.getElementById("pace").innerHTML = pace;
-  document.getElementById("energy").innerHTML = energy;
-}

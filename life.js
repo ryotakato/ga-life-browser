@@ -3,8 +3,8 @@ var Life = function() {
 
   this.x = 0;
   this.y = 0;
-  this.w = 10;
-  this.h = 10;
+  this.w = 5;
+  this.h = 5;
   this.hierarchy = 0;
   this.alive = true;
   this.energy = 0;
@@ -40,7 +40,7 @@ var Animal = Life.extend({
   starve: function() {
     if (this.energy <= 0) {
       this.die();
-      WORLD.lifes.push(new Plant({x: this.x, y: this.y}));
+      WORLD.born(new Plant({x: this.x, y: this.y}));
     }
   },
 
@@ -63,8 +63,12 @@ var Animal = Life.extend({
   walk: function() {
     var move = function(before, upper, p) {
       var after = before + p.amount();
-      p.reverse(after < 0 || upper < after);
-      return before + p.amount();
+      if (after < 0) {
+        after += upper;
+      } else if (upper < after) {
+        after -= upper;
+      }
+      return after;
     }
 
     this.x = move(this.x, WIDTH, this.xp);
@@ -82,16 +86,22 @@ var Animal = Life.extend({
 
     // search prey
     if (!has(this.prey)) {
-      this.prey = _.find(WORLD.feeds(this.hierarchy), function(it) {
-        return isSeeable(it);
+      var preyElement = _.find(WORLD.feeds(this.hierarchy), function(it) {
+        return isSeeable(it.life);
       });
+      if (preyElement) {
+        this.prey = preyElement.life;
+      }
     }
 
     // search predator
     if (!has(this.predator)) {
-      this.predator = _.find(WORLD.enemies(this.hierarchy), function(it) {
-        return isSeeable(it);
+      var predatorElement = _.find(WORLD.enemies(this.hierarchy), function(it) {
+        return isSeeable(it.life);
       });
+      if (predatorElement) {
+        this.predator = predatorElement.life;
+      }
     }
   },
 
@@ -102,8 +112,8 @@ var Animal = Life.extend({
     this.yp.pace = this.defaultPace;
 
     if (this.prey == null && this.predator == null) {
-      this.xp.reverse(_.random(0, 100) < 1); // 1%
-      this.yp.reverse(_.random(0, 100) < 1); // 1%
+      this.xp.reverse(_.random(0, 1000) < 1); // 0.1%
+      this.yp.reverse(_.random(0, 1000) < 1); // 0.1%
       return;
     }
 
@@ -129,7 +139,7 @@ var Animal = Life.extend({
     // if diff sign is minus or p.direction sign is minus, change direction
     p.reverse(p.direction * diff <= 0);
     // chose min diff abs, p.pace
-    p.pace = Math.min(Math.abs(diff), p.pace);
+    //p.pace = Math.min(Math.abs(diff), p.pace);
   },
 
   eat: function() {
@@ -160,10 +170,12 @@ var Animal = Life.extend({
     // search partner
     if (!has(this.partner)) {
       var self = this;
-      this.partner = _.find(WORLD.lifes, function(it) {
+      var partnerElement = _.find(WORLD.elements, function(e) {
+        var it = e.life;
         return it instanceof Animal && it !== self  && self.hierarchy - 10 <= it.hierarchy && it.hierarchy <= self.hierarchy + 10 && isMarriageable(it);
       });
-      if (this.partner) {
+      if (partnerElement) {
+        this.partner = partnerElement.life;
         this.partner.partner = this;
       }
     }
@@ -185,7 +197,7 @@ var Animal = Life.extend({
           defaultPace: Math.round((this.defaultPace + this.partner.defaultPace) / 2 + mutationGaus(2)),
           energy:Math.round((this.energy + this.partner.energy) / 4)
         });
-        WORLD.lifes.push(baby);
+        WORLD.born(baby);
 
         // use energy
         var ene = -1 * Math.round(baby.energy / 5);
