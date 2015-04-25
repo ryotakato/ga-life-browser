@@ -54,8 +54,15 @@ var Animal = Life.extend({
     var xu = this.x + limit;
     var yl = this.y - limit;
     var yu = this.y + limit;
+    var xlm = xl - WIDTH;
+    var xum = xu - WIDTH;
+    var ylm = yl - HEIGHT;
+    var yum = yu - HEIGHT;
     return function(l) { 
-      return xl < l.x && l.x < xu && yl < l.y && l.y < yu;
+      var lx = l.x;
+      var ly = l.y;
+      return (xl < lx && lx < xu && yl < ly && ly < yu)
+             || (xlm < lx && lx < xum && ylm < ly && ly < yum);
     }
   },
 
@@ -86,6 +93,7 @@ var Animal = Life.extend({
 
     // search prey
     if (!has(this.prey)) {
+      this.prey = null;
       var preyElement = _.find(WORLD.feeds(this.hierarchy), function(it) {
         return isSeeable(it.life);
       });
@@ -96,6 +104,7 @@ var Animal = Life.extend({
 
     // search predator
     if (!has(this.predator)) {
+      this.predator = null;
       var predatorElement = _.find(WORLD.enemies(this.hierarchy), function(it) {
         return isSeeable(it.life);
       });
@@ -112,34 +121,44 @@ var Animal = Life.extend({
     this.yp.pace = this.defaultPace;
 
     if (this.prey == null && this.predator == null) {
-      this.xp.reverse(_.random(0, 1000) < 1); // 0.1%
-      this.yp.reverse(_.random(0, 1000) < 1); // 0.1%
+      this.xp.reverse(_.random(0, 100) < 1); // 1%
+      this.yp.reverse(_.random(0, 100) < 1); // 1%
       return;
     }
 
     if (this.predator != null) {
-      this.runAway(this.predator.x - this.x, this.xp);
-      this.runAway(this.predator.y - this.y, this.yp);
+      this.runAway(this.predator.x, this.x, this.xp, WIDTH);
+      this.runAway(this.predator.y, this.y, this.yp, HEIGHT);
       return;
     }
 
     if (this.prey != null) {
-      this.chase(this.prey.x - this.x, this.xp);
-      this.chase(this.prey.y - this.y, this.yp);
+      this.chase(this.prey.x, this.x, this.xp, WIDTH);
+      this.chase(this.prey.y, this.y, this.yp, HEIGHT);
       return;
     }
   },
 
-  runAway: function(diff, p) {
-    // if diff sign equal  p.direction sign, change direction
-    p.reverse(0 <= p.direction * diff);
+  runAway: function(predatorPos, pos, point, upper) {
+    // if next diff is smaller than now, change direction
+    var predatorXModulo = predatorPos % upper;
+    var distAbs = Math.abs(pos % upper - predatorXModulo);
+    var nextPos = (pos + point.amount()) % upper;
+    var nextDistAbs = Math.abs(nextPos - predatorXModulo)
+
+    point.reverse(nextDistAbs < distAbs);
   },
 
-  chase: function(diff, p) {
-    // if diff sign is minus or p.direction sign is minus, change direction
-    p.reverse(p.direction * diff <= 0);
-    // chose min diff abs, p.pace
-    //p.pace = Math.min(Math.abs(diff), p.pace);
+  chase: function(preyPos, pos, point, upper) {
+    // if next diff is smaller than now, change direction
+    var preyXModulo = preyPos % upper;
+    var distAbs = Math.abs(pos % upper - preyXModulo);
+    var nextPos = (pos + point.amount()) % upper;
+    var nextDistAbs = Math.abs(nextPos - preyXModulo)
+
+    point.reverse(distAbs < nextDistAbs);
+
+    point.pace = Math.min(distAbs, point.pace);
   },
 
   eat: function() {

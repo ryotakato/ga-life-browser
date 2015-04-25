@@ -12,7 +12,7 @@ var WORLD = {
     var g = 255;
     var r = 128;
     var b = 0;
-    r = r + l.hierarchy * 4;
+    r = r + l.hierarchy * 2;
     if (255 < r) {
       g = g - (r - 255);
     }
@@ -77,7 +77,7 @@ _.times(220, function() {
   WORLD.born(new Plant({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT)}));
 });
 
-_.times(60, function() {
+_.times(30, function() {
   WORLD.born(new Animal({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT), hierarchy: 15, eye: 30, zone:10, energy: 100}));
 });
 
