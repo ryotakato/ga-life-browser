@@ -16,8 +16,6 @@
     "tests"
   ],
   "dependencies": {
-    "Processing.js": "~1.4.13",
-    "p5js": "~0.4.4",
     "underscore": "~1.8.3",
     "pixi.js": "~2.2.9"
   }
