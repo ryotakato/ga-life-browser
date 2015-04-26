@@ -21,6 +21,7 @@ var Plant = Life.extend({
   init: function(args) {
     _.extend(this, args);
     this.energy = 100;
+    WORLD.energy -= this.energy;
   }
 });
 
@@ -33,6 +34,8 @@ var Animal = Life.extend({
   
     this.xp = new Point(this.defaultPace, -1);
     this.yp = new Point(this.defaultPace, -1);
+
+    WORLD.energy -= this.energy;
   },
 
 
@@ -47,6 +50,9 @@ var Animal = Life.extend({
   // energy gain
   gain: function(ene) {
     this.energy += ene;
+    if (ene < 0) {
+      WORLD.energy += (-1 * ene);
+    }
   },
 
   makeRange: function (limit) {
@@ -92,6 +98,9 @@ var Animal = Life.extend({
     }
 
     // search prey
+    if (this.energy < 30) {
+      this.prey = null;
+    }
     if (!has(this.prey)) {
       this.prey = null;
       var preyElement = _.find(WORLD.feeds(this.hierarchy), function(it) {
@@ -166,9 +175,11 @@ var Animal = Life.extend({
       return;
     }
     var isEatable = this.makeRange(this.zone);
-    if (isEatable(this.prey)) {
+    if (isEatable(this.prey) && this.prey.alive) {
       this.prey.die();
-      this.gain(Math.floor(this.prey.energy / 10));
+      var gain = Math.floor(this.prey.energy / 10);
+      this.gain(gain);
+      WORLD.energy += (this.prey.energy - gain);
       this.prey = null;
     }
   },

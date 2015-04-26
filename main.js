@@ -1,5 +1,6 @@
 
 var WORLD = { 
+  energy:45000,
   elements: [],
   enemies: function(hierarchy) {
     return _.filter(this.elements, function(e) { return hierarchy + 10 < e.life.hierarchy;});
@@ -33,6 +34,7 @@ var WORLD = {
 
   status: function(age) {
     document.getElementById("age").innerHTML = age;
+    document.getElementById("WORLD_energy").innerHTML = WORLD.energy;
     var count = 0;
     var hierarchy = 0;
     var eye = 0;
@@ -135,8 +137,9 @@ function animate() {
     if (_.random(0, 100) < 5) {
       WORLD.born(new Animal({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT), hierarchy: 5, eye: 30, zone:10, energy: 100}));
     } else {
-      WORLD.born(new Plant({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT)}));
-      WORLD.born(new Plant({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT)}));
+      _.times(Math.ceil(WORLD.energy / 10000), function() {
+        WORLD.born(new Plant({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT)}));
+      });
     }
   });
 
