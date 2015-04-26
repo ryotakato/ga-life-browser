@@ -39,6 +39,31 @@ var WORLD = {
     var zone = 0;
     var pace = 0;
     var energy = 0;
+    var hierarchyMap = {
+      h50:0,
+      h40:0,
+      h30:0,
+      h20:0,
+      h10:0,
+      h00:0,
+      count:function(hierarchy) {
+        if (50 <= hierarchy) {
+          this.h50++;
+        } else if (40 <= hierarchy) {
+          this.h40++;
+        } else if (30 <= hierarchy) {
+          this.h30++;
+        } else if (20 <= hierarchy) {
+          this.h20++;
+        } else if (10 <= hierarchy) {
+          this.h10++;
+        } else if (0 <= hierarchy) {
+          this.h00++;
+        }
+      }
+    };
+
+    // check life
     _.each(this.elements, function(e) {
       if (e.life instanceof Animal) {
         count++;
@@ -48,6 +73,7 @@ var WORLD = {
       eye = Math.max(eye, e.life.eye || 0);
       zone = Math.max(zone, e.life.zone || 0);
       pace = Math.max(pace, e.life.defaultPace || 0);
+      hierarchyMap.count(e.life.hierarchy);
     });
     document.getElementById("count").innerHTML = count;
     document.getElementById("hierarchy").innerHTML = hierarchy;
@@ -55,6 +81,13 @@ var WORLD = {
     document.getElementById("zone").innerHTML = zone;
     document.getElementById("pace").innerHTML = pace;
     document.getElementById("energy").innerHTML = energy;
+
+    document.getElementById("h50").innerHTML = hierarchyMap.h50;
+    document.getElementById("h40").innerHTML = hierarchyMap.h40;
+    document.getElementById("h30").innerHTML = hierarchyMap.h30;
+    document.getElementById("h20").innerHTML = hierarchyMap.h20;
+    document.getElementById("h10").innerHTML = hierarchyMap.h10;
+    document.getElementById("h00").innerHTML = hierarchyMap.h00;
   }
 };
 var WIDTH = 1000;
