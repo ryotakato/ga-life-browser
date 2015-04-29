@@ -90,17 +90,41 @@ var WORLD = {
     document.getElementById("h20").innerHTML = hierarchyMap.h20;
     document.getElementById("h10").innerHTML = hierarchyMap.h10;
     document.getElementById("h00").innerHTML = hierarchyMap.h00;
+  },
+
+  width: 1000,
+  height: 500,
+  rain: {
+    fields:[],
+    turn:function() {
+
+      _.each(this.fields, function(e) {
+        e.until--;
+      });
+
+      this.fields = _.filter(this.fields, function(e) { return 0 < e.until;});
+
+      if (ranUtil.random(100) < 1) {
+        this.create();
+      }
+    },
+    create:function() {
+      var until = ranUtil.random(200, 500);
+      this.fields.push({
+        x:ranUtil.random(WORLD.width),
+        y:ranUtil.random(WORLD.height),
+        w:100,
+        h:100,
+        until:until
+      });
+    }
   }
 };
-var WIDTH = 1000;
-var HEIGHT = 500;
 
   // screen config
 var stage = new PIXI.Stage(0x000000);
 
-
-
-var renderer = PIXI.autoDetectRenderer(WIDTH, HEIGHT);
+var renderer = PIXI.autoDetectRenderer(WORLD.width, WORLD.height);
 
 
 var pixiView = document.getElementById("pixiview");
@@ -109,11 +133,11 @@ pixiView.appendChild(renderer.view);
 
 // init life
 _.times(220, function() {
-  WORLD.born(new Plant({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT)}));
+  WORLD.born(new Plant({x: ranUtil.random(WORLD.width), y: ranUtil.random(WORLD.height)}));
 });
 
 _.times(30, function() {
-  WORLD.born(new Animal({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT), hierarchy: 15, eye: 30, zone:10, energy: 100}));
+  WORLD.born(new Animal({x: ranUtil.random(WORLD.width), y: ranUtil.random(WORLD.height), hierarchy: 15, eye: 30, zone:10, energy: 100}));
 });
 
 var age = 0;
@@ -124,7 +148,10 @@ function animate() {
   //graphics.clear();
   stage.removeChildren();
   age++;
-  console.time(age);
+  //console.time(age);
+
+  // rain turn
+  WORLD.rain.turn();
   
   // sweep
   WORLD.sweep();
@@ -135,10 +162,17 @@ function animate() {
   // add plant
   _.times(1, function() {
     if (_.random(0, 100) < 5) {
-      WORLD.born(new Animal({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT), hierarchy: 5, eye: 30, zone:10, energy: 100}));
+      WORLD.born(new Animal({x: ranUtil.random(WORLD.width), y: ranUtil.random(WORLD.height), hierarchy: 5, eye: 30, zone:10, energy: 100}));
     } else {
       _.times(Math.ceil(WORLD.energy / 10000), function() {
-        WORLD.born(new Plant({x: ranUtil.random(WIDTH), y: ranUtil.random(HEIGHT)}));
+
+        var bornSiteIdx = Math.round(ranUtil.random(WORLD.rain.fields.length + 1));
+        if (WORLD.rain.fields.length <= bornSiteIdx) {
+          WORLD.born(new Plant({x: ranUtil.random(WORLD.width), y: ranUtil.random(WORLD.height)}));
+        } else {
+          var rainSite = WORLD.rain.fields[bornSiteIdx];
+          WORLD.born(new Plant({x: rainSite.x + ranUtil.random(rainSite.w), y: rainSite.y + ranUtil.random(rainSite.h)}));
+        }
       });
     }
   });
@@ -173,6 +207,9 @@ function animate() {
   });
 
 
+  // draw rain
+  drawRain();
+
   // draw life
   _.each(WORLD.elements, function(e) {
     e.shape.x = e.life.x;
@@ -181,7 +218,7 @@ function animate() {
     draw(e);
   });
 
-  console.timeEnd(age);
+  //console.timeEnd(age);
   renderer.render(stage);
 }
 
@@ -206,5 +243,18 @@ function draw(e) {
   e.graphics.drawShape(e.shape);
   e.graphics.endFill();
   stage.addChild(e.graphics);
+}
+
+
+function drawRain() {
+
+  _.each(WORLD.rain.fields, function(e) {
+    var rain = new PIXI.Graphics();
+    rain.beginFill(0x0000FF, 0.5);
+    rain.drawRect(e.x, e.y, e.w, e.h);
+    rain.endFill();
+    stage.addChild(rain);
+  });
+
 }
 

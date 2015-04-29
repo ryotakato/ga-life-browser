@@ -60,10 +60,10 @@ var Animal = Life.extend({
     var xu = this.x + limit;
     var yl = this.y - limit;
     var yu = this.y + limit;
-    var xlm = xl - WIDTH;
-    var xum = xu - WIDTH;
-    var ylm = yl - HEIGHT;
-    var yum = yu - HEIGHT;
+    var xlm = xl - WORLD.width;
+    var xum = xu - WORLD.width;
+    var ylm = yl - WORLD.height;
+    var yum = yu - WORLD.height;
     return function(l) { 
       var lx = l.x;
       var ly = l.y;
@@ -84,8 +84,8 @@ var Animal = Life.extend({
       return after;
     }
 
-    this.x = move(this.x, WIDTH, this.xp);
-    this.y = move(this.y, HEIGHT, this.yp);
+    this.x = move(this.x, WORLD.width, this.xp);
+    this.y = move(this.y, WORLD.height, this.yp);
     this.gain(-1 * Math.ceil(this.defaultPace / 5));
   },
 
@@ -136,14 +136,14 @@ var Animal = Life.extend({
     }
 
     if (this.predator != null) {
-      this.runAway(this.predator.x, this.x, this.xp, WIDTH);
-      this.runAway(this.predator.y, this.y, this.yp, HEIGHT);
+      this.runAway(this.predator.x, this.x, this.xp, WORLD.width);
+      this.runAway(this.predator.y, this.y, this.yp, WORLD.height);
       return;
     }
 
     if (this.prey != null) {
-      this.chase(this.prey.x, this.x, this.xp, WIDTH);
-      this.chase(this.prey.y, this.y, this.yp, HEIGHT);
+      this.chase(this.prey.x, this.x, this.xp, WORLD.width);
+      this.chase(this.prey.y, this.y, this.yp, WORLD.height);
       return;
     }
   },
