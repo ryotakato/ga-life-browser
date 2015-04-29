@@ -1,5 +1,14 @@
 
 
+# add concept
+
+* gravity
+* sun & shine
+* rain
+* oxygen density
+* carbon dioxide
+* 
+
 
 # p5.js performance
 
