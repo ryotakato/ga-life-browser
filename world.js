@@ -110,8 +110,8 @@ var WORLD = {
     create:function() {
       var until = ranUtil.random(200, 500);
       this.fields.push({
-        x:ranUtil.random(WORLD.width),
-        y:ranUtil.random(WORLD.height),
+        x:ranUtil.random(WORLD.width - 100),
+        y:ranUtil.random(WORLD.height - 100),
         w:100,
         h:100,
         until:until
