@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>GA test</title>
+  <link type="text/css" rel="stylesheet" href="bower_components/mocha/mocha.css" />
+  <script type="text/javascript" src="bower_components/mocha/mocha.js"></script>
+  <script type="text/javascript" src="bower_components/chai/chai.js"></script>
+
+  <script type="text/javascript" src="bower_components/pixi.js/bin/pixi.js"></script>
+  <script type="text/javascript" src="bower_components/underscore/underscore.js"></script>
+  <script type="text/javascript" src="util.js"></script>
+  <script type="text/javascript" src="life.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+
+  <script>
+    mocha.setup('bdd');
+    var assert = chai.assert;
+  </script>
+
+  <script type="text/javascript" src="test/test.life.js"></script>
+</head>
+
+<body>
+  <div id="mocha">
+  </div>
+  <script>
+    window.onload = function() {
+      mocha.checkLeaks();
+      mocha.run();
+    }
+  </script>
+</body>
+
+</html>
