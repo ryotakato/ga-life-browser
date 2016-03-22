@@ -1,5 +1,5 @@
 {
-  "name": "ga-processing",
+  "name": "ga-life-browser",
   "version": "0.0.0",
   "authors": [
     "ryotakato <ryotakato4@gmail.com>"
@@ -18,5 +18,9 @@
   "dependencies": {
     "underscore": "~1.8.3",
     "pixi.js": "~2.2.9"
+  },
+  "devDependencies": {
+    "mocha": "~2.4.5",
+    "chai": "~3.5.0"
   }
 }
