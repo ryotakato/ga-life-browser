@@ -150,9 +150,9 @@ var Animal = Life.extend({
 
   runAway: function(predatorPos, pos, point, upper) {
     // if next diff is smaller than now, change direction
-    var predatorXModulo = predatorPos % upper;
-    var distAbs = Math.abs(pos % upper - predatorXModulo);
-    var nextPos = (pos + point.amount()) % upper;
+    var predatorXModulo = predatorPos % (upper + 1);
+    var distAbs = Math.abs(pos % (upper + 1) - predatorXModulo);
+    var nextPos = (pos + point.amount()) % (upper + 1);
     var nextDistAbs = Math.abs(nextPos - predatorXModulo)
 
     point.reverse(nextDistAbs < distAbs);
@@ -160,14 +160,14 @@ var Animal = Life.extend({
 
   chase: function(preyPos, pos, point, upper) {
     // if next diff is smaller than now, change direction
-    var preyXModulo = preyPos % upper;
-    var distAbs = Math.abs(pos % upper - preyXModulo);
-    var nextPos = (pos + point.amount()) % upper;
+    var preyXModulo = preyPos % (upper + 1);
+    var distAbs = Math.abs(pos % (upper + 1) - preyXModulo);
+    point.pace = Math.min(distAbs, point.pace);
+    var nextPos = (pos + point.amount()) % (upper + 1);
     var nextDistAbs = Math.abs(nextPos - preyXModulo)
 
     point.reverse(distAbs < nextDistAbs);
 
-    point.pace = Math.min(distAbs, point.pace);
   },
 
   eat: function() {
