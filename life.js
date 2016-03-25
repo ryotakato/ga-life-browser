@@ -50,9 +50,6 @@ var Animal = Life.extend({
   // energy gain
   gain: function(ene) {
     this.energy += ene;
-    if (ene < 0) {
-      WORLD.energy += (-1 * ene);
-    }
   },
 
   makeRange: function (limit) {
@@ -86,7 +83,9 @@ var Animal = Life.extend({
 
     this.x = move(this.x, WORLD.width, this.xp);
     this.y = move(this.y, WORLD.height, this.yp);
-    this.gain(-1 * Math.ceil(this.defaultPace / 5));
+    var returnedEnergy = -1 * Math.ceil(this.defaultPace / 5);
+    this.gain(returnedEnergy);
+    WORLD.energy += (-1 * returnedEnergy);
   },
 
   // search
