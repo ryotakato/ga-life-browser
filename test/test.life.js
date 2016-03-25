@@ -1,5 +1,5 @@
 
-describe("test of test.life.js", function(){
+describe("animal and prant relation", function(){
   var plant;
   var animal;
 
@@ -65,3 +65,40 @@ describe("test of test.life.js", function(){
   });
 
 });
+
+
+describe("animal gain", function() {
+  var animal;
+
+  beforeEach(function() {
+    animal = new Animal({x: 100, y: 100, hierarchy: 15, eye: 30, zone:10, energy: 100, defaultPace: 10});
+    WORLD.born(animal);
+  });
+  afterEach(function() {
+    animal.die();
+    WORLD.sweep();
+  });
+
+  it("gain plus energy", function() {
+    var worldBeforeEnergy = WORLD.energy;
+    var animalBeforeEnergy = animal.energy;
+
+    animal.gain(5);
+
+    assert.equal(animalBeforeEnergy + 5, animal.energy);
+    assert.equal(worldBeforeEnergy, WORLD.energy);
+  
+  });
+
+  it("gain minus energy", function() {
+    var worldBeforeEnergy = WORLD.energy;
+    var animalBeforeEnergy = animal.energy;
+
+    animal.gain(-5);
+
+    assert.equal(animalBeforeEnergy - 5, animal.energy);
+    assert.equal(worldBeforeEnergy, WORLD.energy);
+  
+  });
+
+})
