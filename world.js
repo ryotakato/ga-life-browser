@@ -1,4 +1,5 @@
 var WORLD = { 
+  age: 0,
   width: 1000,
   height: 500,
   energy:45000,
@@ -33,8 +34,8 @@ var WORLD = {
     this.elements = _.filter(this.elements, function(e) { return e.life.alive; });
   },
 
-  status: function(age) {
-    document.getElementById("age").innerHTML = age;
+  status: function() {
+    document.getElementById("age").innerHTML = WORLD.age;
     document.getElementById("WORLD_energy").innerHTML = WORLD.energy;
     var count = 0;
     var hierarchy = 0;
@@ -136,4 +137,13 @@ var WORLD = {
       }
     }
   },
+ 
+  sun: {
+    brightness: 1.0,
+    turn: function() {
+      brightness = (WORLD.age % 10) / 10;
+    }
+  
+  },
+
 };

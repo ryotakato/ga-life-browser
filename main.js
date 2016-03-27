@@ -8,8 +8,6 @@ var main = (function() {
 
 
 
-  var age = 0;
-
   var stoped = false;
 
   var draw = function(e) {
@@ -31,10 +29,12 @@ var main = (function() {
   }
 
 
+  WORLD.atmosphere.init();
+
   var generation = function() {
 
-    age++;
-    //console.time(age);
+    WORLD.age++;
+    //console.time(WORLD.age);
 
     // rain turn
     WORLD.rain.turn();
@@ -43,7 +43,7 @@ var main = (function() {
     WORLD.sweep();
 
     // status
-    WORLD.status(age);
+    WORLD.status();
 
     // add plant
     _.times(1, function() {
@@ -63,6 +63,10 @@ var main = (function() {
       }
     });
 
+    // breathe
+    _.each(WORLD.elements, function(e) {
+      if (e.life.breathe) { e.life.breathe(WORLD.sun.brightness); }
+    });
     // search
     _.each(WORLD.elements, function(e) {
       if (e.life.search) { e.life.search(); }
@@ -104,7 +108,7 @@ var main = (function() {
       draw(e);
     });
 
-    //console.timeEnd(age);
+    //console.timeEnd(WORLD.age);
 
   }
 

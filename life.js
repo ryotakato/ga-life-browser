@@ -24,26 +24,29 @@ var Plant = Life.extend({
     WORLD.energy -= this.energy;
   },
 
-  photosynthesize: function(brightness) {
-    // TODO brightness
+  breathe: function(brightness) {
+    if (0.5 < brightness) {
+      // add energy
+      if (0 < WORLD.energy) {
+        this.energy++;
+        WORLD.energy--;
+      }
+      
+      // world o2 increase
+      WORLD.atmosphere.air[Math.floor(this.y) % WORLD.height][Math.floor(this.x) % WORLD.width].o2++;
+      
+      // world co2 decrease
+      WORLD.atmosphere.air[Math.floor(this.y) % WORLD.height][Math.floor(this.x) % WORLD.width].co2--;
 
-    // add energy
-    this.energy++;
-    
-    // world o2 increase
-    WORLD.atmosphere.air[this.y - 1][this.x - 1].o2++;
-    
-    // world co2 decrease
-    WORLD.atmosphere.air[this.y - 1][this.x - 1].co2--;
+    } else {
+      // world co2 increase
+      WORLD.atmosphere.air[Math.floor(this.y) % WORLD.height][Math.floor(this.x) % WORLD.width].co2++;
+      
+      // world o2 decrease
+      WORLD.atmosphere.air[Math.floor(this.y) % WORLD.height][Math.floor(this.x) % WORLD.width].o2--;
+    }
   },
 
-  breathe: function() {
-    // world co2 increase
-    WORLD.atmosphere.air[this.y - 1][this.x - 1].co2++;
-    
-    // world o2 decrease
-    WORLD.atmosphere.air[this.y - 1][this.x - 1].o2--;
-  },
 });
 
 
@@ -123,8 +126,10 @@ var Animal = Life.extend({
     }
     if (!has(this.prey)) {
       this.prey = null;
-      var preyElement = _.find(WORLD.feeds(this.hierarchy), function(it) {
+      var preyElement = _.max(_.filter(WORLD.feeds(this.hierarchy), function(it) {
         return isSeeable(it.life);
+      }), function(it) {
+        return it.life.energy;
       });
       if (preyElement) {
         this.prey = preyElement.life;
@@ -259,7 +264,15 @@ var Animal = Life.extend({
       this.partner.partner = null;
       this.partner = null;
     }
-  }
+  },
+
+  breathe: function() {
+    // world co2 increase
+    WORLD.atmosphere.air[Math.floor(this.y) % WORLD.height][Math.floor(this.x) % WORLD.width].co2++;
+    
+    // world o2 decrease
+    WORLD.atmosphere.air[Math.floor(this.y) % WORLD.height][Math.floor(this.x) % WORLD.width].o2--;
+  },
 
 
 });
