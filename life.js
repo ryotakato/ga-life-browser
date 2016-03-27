@@ -22,7 +22,28 @@ var Plant = Life.extend({
     _.extend(this, args);
     this.energy = 100;
     WORLD.energy -= this.energy;
-  }
+  },
+
+  photosynthesize: function(brightness) {
+    // TODO brightness
+
+    // add energy
+    this.energy++;
+    
+    // world o2 increase
+    WORLD.atmosphere.air[this.y - 1][this.x - 1].o2++;
+    
+    // world co2 decrease
+    WORLD.atmosphere.air[this.y - 1][this.x - 1].co2--;
+  },
+
+  breathe: function() {
+    // world co2 increase
+    WORLD.atmosphere.air[this.y - 1][this.x - 1].co2++;
+    
+    // world o2 decrease
+    WORLD.atmosphere.air[this.y - 1][this.x - 1].o2--;
+  },
 });
 
 

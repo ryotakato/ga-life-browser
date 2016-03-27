@@ -117,5 +117,23 @@ var WORLD = {
         until:until
       });
     }
-  }
+  },
+
+  atmosphere: {
+    air: [],
+    init: function() {
+      WORLD.atmosphere.air = [];
+      for (var y = 0; y < WORLD.height; y++) {
+        WORLD.atmosphere.air[y] = [];
+        for (var x = 0; x < WORLD.width; x++) {
+          WORLD.atmosphere.air[y][x] = {
+            n2:78100,
+            o2:20950,
+            ar:900,
+            co2:50
+          };
+        }
+      }
+    }
+  },
 };
